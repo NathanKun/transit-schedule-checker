@@ -21,6 +21,18 @@ export class Schedule {
   line: Transport;
   station: Station;
   destination: Destination;
+
+  toUrl(): string {
+    return this.type.name + '/' + this.line.code + '/' + this.station.slug + '/' + this.destination.way + '?id=' + this.line.id;
+  }
+
+  isValid(): boolean {
+    if (!!this.type && !!this.line && !!this.station && !!this.destination) {
+      return true;
+    }
+
+    return false;
+  }
 }
 
 export class Type {

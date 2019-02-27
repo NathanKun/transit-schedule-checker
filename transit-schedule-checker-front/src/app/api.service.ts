@@ -1,28 +1,59 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { catchError, tap, map } from 'rxjs/operators';
-import { Type } from './type';
-import { Transport } from './transport';
-import { Schedule } from './schedule';
+import { Type, Station, Destination, Transport, Schedule } from './models';
 
-const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-};
 const apiUrl = 'https://api-ratp.pierre-grimaud.fr/v3';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ApiService {
 
   constructor(private http: HttpClient) { }
 
   getTransportsByType(type: Type): Observable<Transport[]> {
-    const url = `${apiUrl}/lines/${type.toString()}`;
+    const url = `${apiUrl}/lines/${type.name}`;
+
     return this.http.get<Transport[]>(url).pipe(
+      map((res: any) => {
+        const list = <Transport[]>res.result[type.name];
+
+        for (const t of list) {
+          t.type = type;
+        }
+
+        return list;
+      }),
       tap(_ => console.log(`fetched transports type=${type.toString()}`)),
       catchError(this.handleError<Transport[]>(`getTransportsByType type=${type.toString()}`))
+    );
+  }
+
+  getStationsByTransport(transport: Transport): Observable<Station[]> {
+    const url = `${apiUrl}/stations/${transport.type.name}/${transport.code}?id=${transport.id}`;
+
+    return this.http.get<Station[]>(url).pipe(
+      map((res: any) => <Station[]>res.result.stations),
+      tap(_ => console.log(
+        `fetched stations type=${transport.type.toString()} code=${transport.code} id=${transport.id}`
+      )),
+      catchError(this.handleError<Station[]>(
+        `getStationsByTransport type=${transport.type.toString()} code=${transport.code} id=${transport.id}`
+      ))
+    );
+  }
+
+  getDestinationsByTransport(transport: Transport): Observable<Destination[]> {
+    const url = `${apiUrl}/destinations/${transport.type.name}/${transport.code}?id=${transport.id}`;
+
+    return this.http.get<Destination[]>(url).pipe(
+      map((res: any) => <Destination[]>res.result.destinations),
+      tap(_ => console.log(
+        `fetched destinations type=${transport.type.toString()} code=${transport.code} id=${transport.id}`
+      )),
+      catchError(this.handleError<Destination[]>(
+        `getDestinationsByTransport type=${transport.type.toString()} code=${transport.code} id=${transport.id}`
+      ))
     );
   }
 

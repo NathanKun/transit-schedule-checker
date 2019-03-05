@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap, map } from 'rxjs/operators';
-import { Type, Station, Destination, Transport, Schedule } from './models';
+import { Type, Station, Destination, Transport, Record } from './models';
 
 const apiUrl = 'https://api-ratp.pierre-grimaud.fr/v3';
 
@@ -56,6 +56,23 @@ export class ApiService {
       ))
     );
   }
+
+  getSchedulesByRecord(record: Record): Observable<any> {
+    const url = `${apiUrl}/schedules/${record.type.name}/${record.line.code}/${record.station.slug}/` +
+      `${record.destination.way}?id=${record.line.id}`;
+
+    return this.http.get<any>(url).pipe(
+      map((res: any) => <Destination[]>res.result.schedules),
+      tap(_ => console.log(
+        `fetched schedules url=${url}`
+      )),
+      catchError(this.handleError<Destination[]>(
+        `getSchedulesByRecord url=${url}`
+      ))
+    );
+  }
+
+
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {

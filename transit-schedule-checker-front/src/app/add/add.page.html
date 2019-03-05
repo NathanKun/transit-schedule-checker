@@ -10,34 +10,34 @@
   <ion-list>
     <ion-item>
       <ion-label>Type</ion-label>
-      <ion-select [(ngModel)]="schedule.type" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Type" (ionChange)="typeChanged($event)">
+      <ion-select [(ngModel)]="record.type" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Type" (ionChange)="typeChanged($event)">
         <ion-select-option *ngFor="let type of types" [value]="type">{{type.name}}</ion-select-option>
       </ion-select>
     </ion-item>
 
     <ion-item>
       <ion-label>Line</ion-label>
-      <ion-select [(ngModel)]="schedule.line" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Line" (ionChange)="lineChanged($event)" [disabled]="lines.length === 0">
+      <ion-select [(ngModel)]="record.line" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Line" (ionChange)="lineChanged($event)" [disabled]="lines.length === 0">
         <ion-select-option *ngFor="let line of lines" [value]="line">{{line.name + ' ' + line.directions}}</ion-select-option>
       </ion-select>
     </ion-item>
 
     <ion-item>
       <ion-label>Station</ion-label>
-      <ion-select [(ngModel)]="schedule.station" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Station" [disabled]="stations.length === 0">
+      <ion-select [(ngModel)]="record.station" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Station" [disabled]="stations.length === 0">
         <ion-select-option *ngFor="let station of stations" [value]="station">{{station.name}}</ion-select-option>
       </ion-select>
     </ion-item>
 
     <ion-item>
       <ion-label>Destination</ion-label>
-      <ion-select [(ngModel)]="schedule.destination" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Destination" [disabled]="destinations.length === 0">
+      <ion-select [(ngModel)]="record.destination" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Destination" [disabled]="destinations.length === 0">
         <ion-select-option *ngFor="let destination of destinations" [value]="destination">{{destination.name}}</ion-select-option>
       </ion-select>
     </ion-item>
 
   </ion-list>
 
-  <ion-button id="tab-add-btn" color="primary" (click) ="addButtonClicked()" [disabled]="!schedule.isValid()">Add</ion-button>
+  <ion-button id="tab-add-btn" color="primary" (click) ="addButtonClicked()" [disabled]="!record.isValid()">Add</ion-button>
 
 </ion-content>

@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { LoadingController, AlertController } from '@ionic/angular';
-import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { CookieService } from 'ngx-cookie-service';
+import { LocalStorage } from '@ngx-pwa/local-storage';
 import { zip } from 'rxjs';
 import { ApiService } from '../api.service';
-import { Type, Station, Destination, Transport, Schedule } from '../models';
+import { Type, Station, Destination, Transport, Schedule, Record } from '../models';
 
 @Component({
   selector: 'app-add',
@@ -16,13 +15,11 @@ export class AddPage {
   constructor(public api: ApiService,
     public loadingController: LoadingController,
     public alertController: AlertController,
-    public router: Router,
-    public route: ActivatedRoute,
-    private cookieService: CookieService) {
+    private localStorage: LocalStorage) {
 
   }
 
-  schedule = new Schedule();
+  record = new Record();
 
   types: Type[] = Type.types;
   lines: Transport[] = [];
@@ -34,37 +31,36 @@ export class AddPage {
   };
 
   typeChanged(event) {
-    this.getTransportsByType(event.detail.value);
+    const value = event.detail.value;
+    if (value === '') {
+      return;
+    }
+    this.getTransportsByType(value);
   }
 
   lineChanged(event) {
-    console.log(event);
+    const value = event.detail.value;
+    if (value === '') {
+      return;
+    }
     this.getStationsAndDestinationsByTransport(event.detail.value);
   }
 
-  async addButtonClicked() {
-    console.log(this.schedule.toUrl());
+  addButtonClicked() {
+    this.localStorage.getItem('records').subscribe((records: Record[]) => {
+      if (records === null) {
+        records = [];
+      }
+      records.push(this.record);
 
-    let schedulesSaved: string;
-
-    if (this.cookieService.check('schedules')) {
-      schedulesSaved = this.cookieService.get('schedules');
-      schedulesSaved += '|';
-    } else {
-      schedulesSaved = '';
-    }
-
-    schedulesSaved += this.schedule.toUrl();
-
-    this.cookieService.set('schedules', schedulesSaved);
-
-    const alert = await this.alertController.create({
-      header: 'Add Transport',
-      message: 'Success.',
-      buttons: ['OK']
+      this.localStorage.setItem('records', records).subscribe(() => {
+        this.alertController.create({
+          header: 'Add Transport',
+          message: 'Success.',
+          buttons: ['OK']
+        }).then((a) => a.present());
+      });
     });
-
-    await alert.present();
   }
 
   async getTransportsByType(type: Type) {
@@ -80,9 +76,9 @@ export class AddPage {
         this.stations = [];
         this.destinations = [];
 
-        this.schedule.line = undefined;
-        this.schedule.station = undefined;
-        this.schedule.destination = undefined;
+        this.record.line = undefined;
+        this.record.station = undefined;
+        this.record.destination = undefined;
 
         loading.dismiss();
       }, err => {
@@ -107,8 +103,8 @@ export class AddPage {
         this.stations = pair.stations;
         this.destinations = pair.destinations;
 
-        this.schedule.station = undefined;
-        this.schedule.destination = undefined;
+        this.record.station = undefined;
+        this.record.destination = undefined;
 
         loading.dismiss();
       }, err => {

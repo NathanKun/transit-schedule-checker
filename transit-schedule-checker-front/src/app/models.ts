@@ -17,14 +17,16 @@ export class Transport {
 }
 
 export class Schedule {
+  message: string;
+  destination: string;
+}
+
+export class Record {
   type: Type;
   line: Transport;
   station: Station;
   destination: Destination;
-
-  toUrl(): string {
-    return this.type.name + '/' + this.line.code + '/' + this.station.slug + '/' + this.destination.way + '?id=' + this.line.id;
-  }
+  timing: Schedule[];
 
   isValid(): boolean {
     if (!!this.type && !!this.line && !!this.station && !!this.destination) {

@@ -26,7 +26,7 @@ export class Record {
   line: Transport;
   station: Station;
   destination: Destination;
-  timing: Schedule[];
+  schedules: Schedule[];
 
   isValid(): boolean {
     if (!!this.type && !!this.line && !!this.station && !!this.destination) {
@@ -38,11 +38,11 @@ export class Record {
 }
 
 export class Type {
-  static readonly RER = new Type('RERS', 'rers', true);
-  static readonly METRO = new Type('METRO', 'metros', true);
-  static readonly BUS = new Type('BUS', 'bus', false);
-  static readonly TRAMWAY = new Type('TRAMWAY', 'tramways', true);
-  static readonly NOCTILIEN = new Type('NOCTILIEN', 'noctiliens', false);
+  static readonly RER = new Type('RERS', 'rers', true, 'RER');
+  static readonly METRO = new Type('METRO', 'metros', true, 'Metro');
+  static readonly BUS = new Type('BUS', 'bus', false, 'Bus');
+  static readonly TRAMWAY = new Type('TRAMWAY', 'tramways', true, 'Tramway');
+  static readonly NOCTILIEN = new Type('NOCTILIEN', 'noctiliens', false, 'Noctilien');
 
   static readonly types: Type[] = [Type.METRO, Type.BUS, Type.RER, Type.TRAMWAY, Type.NOCTILIEN];
 
@@ -56,7 +56,7 @@ export class Type {
     throw new Error('given name "' + name + '" is not a Type');
   }
 
-  constructor(private key: string, public readonly name: string, public readonly hasTrafic: boolean) {
+  constructor(private key: string, public readonly name: string, public readonly hasTrafic: boolean, public readonly prettyName: string) {
   }
 
   toString() {

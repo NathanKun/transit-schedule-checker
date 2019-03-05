@@ -1,9 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ApiService } from '../api.service';
 import { Type, Station, Destination, Transport, Schedule, Record } from '../models';
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: 'dashboard.page.html',
@@ -11,7 +10,10 @@ import { Type, Station, Destination, Transport, Schedule, Record } from '../mode
 })
 export class DashboardPage {
 
+  @ViewChild('reorderGroup') reorderGroup: any;
+
   records: Record[] = [];
+  showDeleteButtons = false;
 
   constructor(public api: ApiService,
     public loadingController: LoadingController,
@@ -28,7 +30,27 @@ export class DashboardPage {
         this.records = data;
       }
 
-      console.log(this.records);
+      for (const record of this.records) {
+        this.api.getSchedulesByRecord(record).subscribe(res => {
+          console.log(res);
+          record.schedules = res;
+        }, err => {
+          console.log(err);
+        });
+      }
     });
+  }
+
+  deleteRecord(index: number) {
+    this.records.splice(index, 1);
+  }
+
+  reorderButtonClicked() {
+    this.reorderGroup.disabled = !this.reorderGroup.disabled;
+  }
+
+  reorderHandler(event) {
+    console.log(event);
+    this.records = event.detail.complete(this.records);
   }
 }

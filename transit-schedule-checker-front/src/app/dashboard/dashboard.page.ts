@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ApiService } from '../api.service';
@@ -43,6 +43,9 @@ export class DashboardPage {
 
   deleteRecord(index: number) {
     this.records.splice(index, 1);
+
+    const records = Object.assign([], this.records);
+    this.localStorage.setItem('records', records).subscribe(() => {});
   }
 
   reorderButtonClicked() {
@@ -52,5 +55,8 @@ export class DashboardPage {
   reorderHandler(event) {
     console.log(event);
     this.records = event.detail.complete(this.records);
+
+    const records = Object.assign([], this.records);
+    this.localStorage.setItem('records', records).subscribe(() => {});
   }
 }

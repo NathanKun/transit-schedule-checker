@@ -1,18 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { catchError, tap, map } from 'rxjs/operators';
+import { parseString } from 'xml2js';
 import { Type, Station, Destination, Transport, Record, Schedule } from './models';
 
-const apiUrl = 'https://api-ratp.pierre-grimaud.fr/v3';
+const ratpUrl = 'https://api-ratp.pierre-grimaud.fr/v3';
+const transilienUrl = isDevMode() ? 'http://localhost:8000/transilien.php' : 'https://transitapi.catprogrammer.com/transilien.php';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient) { }
 
   getTransportsByType(type: Type): Observable<Transport[]> {
-    const url = `${apiUrl}/lines/${type.name}`;
+    const url = `${ratpUrl}/lines/${type.name}`;
 
     return this.http.get<Transport[]>(url).pipe(
       map((res: any) => {
@@ -30,7 +33,7 @@ export class ApiService {
   }
 
   getStationsByTransport(transport: Transport): Observable<Station[]> {
-    const url = `${apiUrl}/stations/${transport.type.name}/${transport.code}?id=${transport.id}`;
+    const url = `${ratpUrl}/stations/${transport.type.name}/${transport.code}?id=${transport.id}`;
 
     return this.http.get<Station[]>(url).pipe(
       map((res: any) => <Station[]>res.result.stations),
@@ -44,7 +47,7 @@ export class ApiService {
   }
 
   getDestinationsByTransport(transport: Transport): Observable<Destination[]> {
-    const url = `${apiUrl}/destinations/${transport.type.name}/${transport.code}?id=${transport.id}`;
+    const url = `${ratpUrl}/destinations/${transport.type.name}/${transport.code}?id=${transport.id}`;
 
     return this.http.get<Destination[]>(url).pipe(
       map((res: any) => <Destination[]>res.result.destinations),
@@ -57,8 +60,8 @@ export class ApiService {
     );
   }
 
-  getSchedulesByRecord(record: Record): Observable<any> {
-    const url = `${apiUrl}/schedules/${record.type.name}/${record.line.code}/${record.station.slug}/` +
+  getSchedulesByRecord(record: Record): Observable<Schedule[]> {
+    const url = `${ratpUrl}/schedules/${record.type.name}/${record.line.code}/${record.station.slug}/` +
       `${record.destination.way}`;
 
     return this.http.get<any>(url).pipe(
@@ -80,7 +83,37 @@ export class ApiService {
     );
   }
 
+  getTransilienSchedules(from: string, to: string): Observable<any> {
+    const url = `${transilienUrl}?from=${from}&to=${to}`;
 
+    return this.http.get(url, { observe: 'response' }).pipe(
+      map((res: HttpResponse<Schedule[]>) => {
+        if (res.status === 200) {
+          const xml = res.body;
+          const schedules: Schedule[] = [];
+
+          parseString(xml, (err, result) => {
+            console.log(result);
+            console.log(err);
+          });
+
+          return schedules;
+        } else {
+          const schedule = new Schedule();
+          schedule.message = res.status + ' ' + res.statusText;
+          schedule.destination = 'error';
+
+          return schedule;
+        }
+      }),
+      tap(_ => console.log(
+        `fetched transilien schedules url=${url}`
+      )),
+      catchError(this.handleError<Destination[]>(
+        `getTransilienSchedule`
+      ))
+    );
+  }
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {

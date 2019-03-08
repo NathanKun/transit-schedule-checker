@@ -7,6 +7,7 @@ if (!isset($_GET['from']) || !isset($_GET['to'])) {
 }
 
 header('Content-Type: application/xml');
+header('Access-Control-Allow-Origin: *');
 
 include('credentials.inc.php');
 global $username;

@@ -22,22 +22,51 @@
       </ion-select>
     </ion-item>
 
-    <ion-item>
-      <ion-label>Station</ion-label>
-      <ion-select [(ngModel)]="record.station" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Station" [disabled]="stations.length === 0">
-        <ion-select-option *ngFor="let station of stations" [value]="station">{{station.name}}</ion-select-option>
-      </ion-select>
-    </ion-item>
 
-    <ion-item>
-      <ion-label>Destination</ion-label>
-      <ion-select [(ngModel)]="record.destination" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Destination" [disabled]="destinations.length === 0">
-        <ion-select-option *ngFor="let destination of destinations" [value]="destination">{{destination.name}}</ion-select-option>
-      </ion-select>
-    </ion-item>
+    <ng-container *ngIf="!typeIsTransilien; else elseBlock">
+      <ion-item>
+        <ion-label>Station</ion-label>
+        <ion-select [(ngModel)]="record.station" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Station" [disabled]="stations.length === 0">
+          <ion-select-option *ngFor="let station of stations" [value]="station">{{station.name}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Destination</ion-label>
+        <ion-select [(ngModel)]="record.destination" interface="popover" [interfaceOptions]="customPopoverOptions" placeholder="Select One Destination" [disabled]="destinations.length === 0">
+          <ion-select-option *ngFor="let destination of destinations" [value]="destination">{{destination.name}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ng-container>
+
+    <ng-template #elseBlock>
+      <div class="autocomplete">
+        <ion-item>
+          <ion-label floating>Station</ion-label>
+          <ion-input type="text" [(ngModel)]="inputTransilienFromStation" (ionChange)="searchTransilienFrom()" debounce=500 (ionFocus)="transilienFromInputTagFocused()" (ionBlur)="transilienFromInputTagBlured()"></ion-input>
+        </ion-item>
+        <ion-list>
+          <ion-item *ngFor="let station of filteredTransilienFromStations" (click)="transilienFromSelected(station)">
+            {{station.name}}
+          </ion-item>
+        </ion-list>
+      </div>
+
+      <div class="autocomplete">
+        <ion-item>
+          <ion-label floating>Destination</ion-label>
+          <ion-input type="text" [(ngModel)]="inputTransilienToStation" (ionChange)="searchTransilienTo()" debounce=500 (ionFocus)="transilienToInputTagFocused()" (ionBlur)="transilienToInputTagBlured()"></ion-input>
+        </ion-item>
+        <ion-list>
+          <ion-item *ngFor="let station of filteredTransilienToStations" (click)="transilienToSelected(station)">
+            {{station.name}}
+          </ion-item>
+        </ion-list>
+      </div>
+    </ng-template>
 
   </ion-list>
 
-  <ion-button id="tab-add-btn" color="primary" (click) ="addButtonClicked()" [disabled]="!record.isValid()">Add</ion-button>
+  <ion-button id="tab-add-btn" color="primary" (click)="addButtonClicked()" [disabled]="!record.isValid()">Add</ion-button>
 
 </ion-content>

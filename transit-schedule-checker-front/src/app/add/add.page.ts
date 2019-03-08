@@ -3,7 +3,7 @@ import { LoadingController, AlertController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { zip } from 'rxjs';
 import { ApiService } from '../api.service';
-import { Type, Station, Destination, Transport, Record } from '../models';
+import { Type, Station, Destination, Transport, Record, TransilienStations } from '../models';
 
 @Component({
   selector: 'app-add',
@@ -24,6 +24,18 @@ export class AddPage {
   lines: Transport[] = [];
   stations: Station[] = [];
   destinations: Destination[] = [];
+  transilienDestinations: Station[] = [];
+
+  filteredTransilienFromStations: Station[] = [];
+  filteredTransilienToStations: Station[] = [];
+
+  typeIsTransilien = false;
+
+  inputTransilienFromStation = '';
+  inputTransilienToStation = '';
+
+  transilienFromInputTagFocus = false;
+  transilienToInputTagFocus = false;
 
   customPopoverOptions: any = {
     cssClass: 'text-wrap-popover'
@@ -34,12 +46,29 @@ export class AddPage {
     if (value === '') {
       return;
     }
-    this.getTransportsByType(value);
+
+    if (value === Type.TRANSILIEN) {
+      this.typeIsTransilien = true;
+
+      this.lines = [Transport.TRANSILIEN];
+      this.stations = TransilienStations;
+      this.transilienDestinations = TransilienStations;
+      this.destinations = [];
+
+      this.record.line = Transport.TRANSILIEN;
+      this.record.station = undefined;
+      this.record.transilienDestination = undefined;
+      this.record.destination = undefined;
+    } else {
+      this.typeIsTransilien = false;
+      this.getTransportsByType(value);
+    }
+
   }
 
   lineChanged(event) {
     const value = event.detail.value;
-    if (value === '') {
+    if (value === '' || value === Transport.TRANSILIEN) {
       return;
     }
     this.getStationsAndDestinationsByTransport(event.detail.value);
@@ -110,5 +139,55 @@ export class AddPage {
         console.log(err);
         loading.dismiss();
       });
+  }
+
+  searchTransilienFrom() {
+    if (this.inputTransilienFromStation.trim().length < 3 || !this.transilienFromInputTagFocus) {
+      this.filteredTransilienFromStations = [];
+      return;
+    }
+
+    this.filteredTransilienFromStations = this.stations.filter(
+      (item: Station) => item.name.toUpperCase().includes(this.inputTransilienFromStation.toUpperCase())
+    );
+  }
+
+  searchTransilienTo() {
+    if (this.inputTransilienToStation.trim().length < 3 || !this.transilienToInputTagFocus) {
+      this.filteredTransilienToStations = [];
+      return;
+    }
+
+    this.filteredTransilienToStations = this.stations.filter(
+      (item: Station) => item.name.toUpperCase().includes(this.inputTransilienToStation.toUpperCase())
+    );
+  }
+
+  transilienFromSelected(station: Station) {
+    this.record.station = station;
+    this.inputTransilienFromStation = station.name;
+    this.filteredTransilienFromStations = [];
+  }
+
+  transilienToSelected(station: Station) {
+    this.record.transilienDestination = station;
+    this.inputTransilienToStation = station.name;
+    this.filteredTransilienToStations = [];
+  }
+
+  transilienFromInputTagFocused() {
+    this.transilienFromInputTagFocus = true;
+  }
+
+  transilienFromInputTagBlured() {
+    this.transilienFromInputTagFocus = false;
+  }
+
+  transilienToInputTagFocused() {
+    this.transilienToInputTagFocus = true;
+  }
+
+  transilienToInputTagBlured() {
+    this.transilienToInputTagFocus = false;
   }
 }

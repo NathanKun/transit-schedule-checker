@@ -12,6 +12,10 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <ion-list>
     <ion-reorder-group #reorderGroup (ionItemReorder)="reorderHandler($event)">
       <ion-item *ngFor="let record of records; let i = index">

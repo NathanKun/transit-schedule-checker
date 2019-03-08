@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { LoadingController, AlertController } from '@ionic/angular';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { zip } from 'rxjs';
 import { ApiService } from '../api.service';
-import { Type, Station, Destination, Transport, Schedule, Record } from '../models';
+import { Type, Station, Destination, Transport, Record } from '../models';
 
 @Component({
   selector: 'app-add',

@@ -67,7 +67,7 @@ export class ApiService {
     return this.http.get<any>(url).pipe(
       map((res: any) => <Schedule[]>res.result.schedules),
       tap(_ => console.log(
-        `fetched schedules url=${url}`
+        `fetched ratp schedules url=${url}`
       )),
       catchError((error: any): Observable<Schedule[]> => {
         const schedule = new Schedule();
@@ -83,33 +83,86 @@ export class ApiService {
     );
   }
 
-  getTransilienSchedules(from: string, to: string): Observable<any> {
+  getTransilienSchedules(from: string, to: string): Observable<Schedule[]> {
     const url = `${transilienUrl}?from=${from}&to=${to}`;
 
-    return this.http.get(url, { observe: 'response' }).pipe(
-      map((res: HttpResponse<Schedule[]>) => {
+    return this.http.get(url, { observe: 'response', responseType: 'text' }).pipe(
+      map((res: HttpResponse<string>) => {
         if (res.status === 200) {
-          const xml = res.body;
           const schedules: Schedule[] = [];
+          const xml = res.body;
 
-          parseString(xml, (err, result) => {
-            console.log(result);
-            console.log(err);
+          parseString(xml, (err, result) => { // this is a sync function
+            /*
+            const example = {
+              'passages': {
+                '$': { 'gare': '87382200' },
+                'train': [
+                  {
+                    'date': [{
+                      '_': '11/03/2019 15:38',
+                      '$': { 'mode': 'R' }
+                    }],
+                    'num': ['134647'],
+                    'miss': ['SEBU'],
+                    'term': ['87382481']
+                  }, {
+                    'date': [{
+                      '_': '11/03/2019 15:53',
+                      '$': { 'mode': 'R' }
+                    }],
+                    'num': ['134649'],
+                    'miss': ['SEBU'],
+                    'term': ['87382481']
+                  }
+                ]
+              }
+            };
+            */
+
+            if (err != null) {
+              const schedule = new Schedule();
+              schedule.message = res.status + ' ' + res.statusText;
+              schedule.destination = 'error';
+
+              return [schedule];
+            }
+
+            const trains: any[] = result.passages.train;
+
+            for (const train of trains) {
+              const datetimeStr = train.date[0]._;
+              const split = datetimeStr.split(' ');
+              const dateSplit = split[0].split('/');
+              const timeSplit = split[1].split(':');
+              const datetime: number = new Date(dateSplit[2], dateSplit[1] - 1, dateSplit[0], timeSplit[0], timeSplit[1]).getTime();
+              const diffMinutes = Math.floor((datetime - Date.now()) / 1000 / 60);
+
+              const mode = train.date[0].$.mode === 'R' ? '' : ' Theory'; // this could be: R or T. R for Real time, T for Theory
+              const status = !!train.etat ? (' ' + train.etat[0]) : ''; // this could be: no attr, Retardé, Supprimé
+
+              const schedule = new Schedule();
+              schedule.message = `In ${diffMinutes} mins (${train.date[0]._})${mode}${status}`;
+              schedule.destination = train.miss;
+
+              schedules.push(schedule);
+            }
           });
 
           return schedules;
+
         } else {
           const schedule = new Schedule();
           schedule.message = res.status + ' ' + res.statusText;
           schedule.destination = 'error';
 
-          return schedule;
+          return [schedule];
         }
       }),
       tap(_ => console.log(
         `fetched transilien schedules url=${url}`
       )),
-      catchError(this.handleError<Destination[]>(
+      catchError(this.handleError<Schedule[]>(
         `getTransilienSchedule`
       ))
     );

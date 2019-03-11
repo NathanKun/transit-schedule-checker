@@ -40,24 +40,20 @@ export class DashboardPage {
     const observables = [];
     for (const record of this.records) {
       let obs: Observable<Schedule[]>;
-
-      if (record.type === Type.TRANSILIEN) {
+      if (record.type.name === Type.TRANSILIEN.name) {
         obs = this.api.getTransilienSchedules(record.station.slug, record.transilienDestination.slug);
         observables.push(obs);
       } else {
         obs = this.api.getSchedulesByRecord(record);
         observables.push(obs);
       }
-
-      obs.subscribe((res) => {
-        record.schedules = res;
-      }, err => {
-        console.log(err);
-      });
     }
 
-    // TODO: this called twice the api!!
-    forkJoin(...observables).subscribe(_ => {
+    forkJoin(...observables).subscribe(results => {
+      for (let i = 0; i < results.length; i++) {
+        this.records[i].schedules = results[i];
+      }
+
       if (onFinished instanceof Function) {
         onFinished.apply(null);
       }

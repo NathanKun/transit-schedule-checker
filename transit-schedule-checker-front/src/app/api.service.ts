@@ -5,7 +5,7 @@ import { catchError, tap, map } from 'rxjs/operators';
 import { parseString } from 'xml2js';
 import { Type, Station, Destination, Transport, Record, Schedule } from './models';
 
-const ratpUrl = 'https://api-ratp.pierre-grimaud.fr/v3';
+const ratpUrl = 'https://transitapi.catprogrammer.com/ratp';
 const transilienUrl = isDevMode() ? 'http://localhost:8000/transilien.php' : 'https://transitapi.catprogrammer.com/transilien.php';
 
 @Injectable({ providedIn: 'root' })

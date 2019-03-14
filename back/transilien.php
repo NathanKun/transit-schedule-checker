@@ -1,5 +1,22 @@
 <?php
 
+include('credentials.inc.php');
+global $username;
+global $password;
+global $credential;
+
+if (!isset($_GET['credential'])) {
+	http_response_code(401);
+	echo '401 unauthorized';
+	return;
+}
+
+if ($_GET['credential'] != $credential) {
+	http_response_code(403);
+	echo '403 Not allowed';
+	return;
+}
+
 if (!isset($_GET['from']) || !isset($_GET['to'])) {
 	http_response_code(400);
 	echo '400 Bad request';
@@ -8,10 +25,6 @@ if (!isset($_GET['from']) || !isset($_GET['to'])) {
 
 header('Content-Type: application/xml');
 header('Access-Control-Allow-Origin: *');
-
-include('credentials.inc.php');
-global $username;
-global $password;
 
 $from_station = $_GET['from'];
 $to_station = $_GET['to'];

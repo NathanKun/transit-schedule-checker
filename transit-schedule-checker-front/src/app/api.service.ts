@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { parseString } from 'xml2js';
 import { Type, Station, Destination, Transport, Record, Schedule, Traffic } from './models';
+import { Credentials } from './credentials';
 
 const ratpUrl = 'https://transitapi.catprogrammer.com/ratp';
 const transilienUrl = 'https://transitapi.catprogrammer.com/transilien.php';
@@ -84,7 +85,7 @@ export class ApiService {
   }
 
   getTransilienSchedules(from: string, to: string): Observable<Schedule[]> {
-    const url = `${transilienUrl}?from=${from}&to=${to}`;
+    const url = `${transilienUrl}?from=${from}&to=${to}&credential=${Credentials.TransilienCredential}`;
 
     return this.http.get(url, { observe: 'response', responseType: 'text' }).pipe(
       map((res: HttpResponse<string>) => {

@@ -2,7 +2,6 @@ import { Component, ViewChild } from '@angular/core';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { Observable, forkJoin } from 'rxjs';
-import { parseString } from 'xml2js';
 import { ApiService } from '../api.service';
 import { Schedule, Type, Record } from '../models';
 @Component({
@@ -80,7 +79,11 @@ export class DashboardPage {
   reorderHandler(event) {
     this.records = event.detail.complete(this.records);
 
-    const records = Object.assign([], this.records);
+    const records: Record[] = this.records.map(x => Object.assign({}, x));
+    for (const rec of records) {
+      rec.schedules = undefined;
+    }
+
     this.localStorage.setItem('records', records).subscribe(() => { });
   }
 }

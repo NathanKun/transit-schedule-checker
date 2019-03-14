@@ -1,4 +1,4 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
@@ -6,7 +6,7 @@ import { parseString } from 'xml2js';
 import { Type, Station, Destination, Transport, Record, Schedule } from './models';
 
 const ratpUrl = 'https://transitapi.catprogrammer.com/ratp';
-const transilienUrl = isDevMode() ? 'http://localhost:8000/transilien.php' : 'https://transitapi.catprogrammer.com/transilien.php';
+const transilienUrl = 'https://transitapi.catprogrammer.com/transilien.php';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {

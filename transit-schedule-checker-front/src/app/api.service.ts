@@ -3,7 +3,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { parseString } from 'xml2js';
-import { Type, Station, Destination, Transport, Record, Schedule } from './models';
+import { Type, Station, Destination, Transport, Record, Schedule, Traffic } from './models';
 
 const ratpUrl = 'https://transitapi.catprogrammer.com/ratp';
 const transilienUrl = 'https://transitapi.catprogrammer.com/transilien.php';
@@ -64,7 +64,7 @@ export class ApiService {
     const url = `${ratpUrl}/schedules/${record.type.name}/${record.line.code}/${record.station.slug}/` +
       `${record.destination.way}`;
 
-    return this.http.get<any>(url).pipe(
+    return this.http.get<Schedule[]>(url).pipe(
       map((res: any) => <Schedule[]>res.result.schedules),
       tap(_ => console.log(
         `fetched ratp schedules url=${url}`
@@ -165,6 +165,51 @@ export class ApiService {
       catchError(this.handleError<Schedule[]>(
         `getTransilienSchedule`
       ))
+    );
+  }
+
+  public getRatpTraffic(noNormal: boolean) {
+    const url = `${ratpUrl}/traffic`;
+
+    return this.http.get<Traffic[]>(url).pipe(
+      map((res: any) => {
+        const traffics: Traffic[] = [];
+        res = res.result;
+
+        if (!!res.metros) {
+          for (const item of res.metros) {
+            const traffic = item as Traffic;
+            traffic.type = Type.METRO;
+
+            traffics.push(traffic);
+          }
+        }
+
+        if (!!res.rers) {
+          for (const item of res.rers) {
+            const traffic = item as Traffic;
+            traffic.type = Type.RER;
+
+            traffics.push(traffic);
+          }
+        }
+
+        if (!!res.tramways) {
+          for (const item of res.tramways) {
+            const traffic = item as Traffic;
+            traffic.type = Type.TRAMWAY;
+
+            traffics.push(traffic);
+          }
+        }
+
+        return traffics;
+      }),
+      map((traffics: Traffic[]) => traffics.filter(t => !noNormal || t.slug !== 'normal')),
+      tap(_ => console.log(
+        `fetched ratp traffic url=${url}`
+      )),
+      catchError(this.handleError<Traffic[]>(`getRatpTraffic`))
     );
   }
 

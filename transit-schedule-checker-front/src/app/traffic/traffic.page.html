@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Traffic
+    </ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="changeNoNormal()">{{noNormal ? 'All' : 'Less'}}</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+    <ion-card *ngFor="let traffic of traffics">
+      <ion-card-header>
+        <ion-card-subtitle>{{traffic.title}}</ion-card-subtitle>
+        <ion-card-title>{{traffic.type.prettyName}} {{traffic.line}}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        {{traffic.message}}
+      </ion-card-content>
+    </ion-card>
+</ion-content>

@@ -1,3 +1,11 @@
+export class Traffic {
+  line: string;
+  slug: string;
+  title: string;
+  message: string;
+  type: Type;
+}
+
 export class Destination {
   name: string;
   way: string;

@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { LoadingController, AlertController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { Observable, forkJoin } from 'rxjs';
 import { ApiService } from '../api.service';
@@ -17,7 +17,6 @@ export class DashboardPage {
   showDeleteButtons = false;
 
   constructor(public api: ApiService,
-    public loadingController: LoadingController,
     public alertController: AlertController,
     private localStorage: LocalStorage) {
 

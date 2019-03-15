@@ -35,8 +35,15 @@ export class DashboardPage {
   }
 
   loadSchedules(onFinished: Function) {
+    if (this.records.length === 0) {
+      if (onFinished instanceof Function) {
+        onFinished.apply(null);
+      }
+    }
+
     const observables = [];
     for (const record of this.records) {
+      // schedules
       let obs: Observable<Schedule[]>;
       if (record.type.name === Type.TRANSILIEN.name) {
         obs = this.api.getTransilienSchedules(record.station.slug, record.transilienDestination.slug);
@@ -44,6 +51,13 @@ export class DashboardPage {
       } else {
         obs = this.api.getSchedulesByRecord(record);
         observables.push(obs);
+      }
+
+      // traffics
+      if (record.type.name !== Type.TRANSILIEN.name && record.type.hasTrafic) {
+        this.api.getRatpTrafficByRecord(record).subscribe(res => {
+          record.traffic = res;
+        });
       }
     }
 

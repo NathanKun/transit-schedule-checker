@@ -214,6 +214,23 @@ export class ApiService {
     );
   }
 
+  public getRatpTrafficByRecord(record: Record) {
+    const url = `${ratpUrl}/traffic/${record.type.name}/${record.line.code}`;
+
+    return this.http.get<Traffic>(url).pipe(
+      map((res: any) => {
+        const traffic = res.result as Traffic;
+        traffic.type = record.type;
+
+        return traffic;
+      }),
+      tap(_ => console.log(
+        `fetched ratp traffic by record url=${url}`
+      )),
+      catchError(this.handleError<Traffic>(`getRatpTrafficByRecord`))
+    );
+  }
+
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
 

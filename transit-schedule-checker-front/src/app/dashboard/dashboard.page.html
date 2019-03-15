@@ -27,12 +27,17 @@
               <h2>{{record.line.name}}</h2>
               <h3>From {{record.station.name}} to {{!!record.destination ? record.destination.name : record.transilienDestination.name}}</h3>
 
-              <ng-container *ngIf="!!record.schedules; else elseBlock">
+              <ng-container *ngIf="!!record.traffic && record.traffic.slug !== 'normal'">
+                <ion-label color="danger">{{record.traffic.title}}</ion-label>
+                <ion-label text-wrap color="danger">{{record.traffic.message}}</ion-label>
+              </ng-container>
+
+              <ng-container *ngIf="!!record.schedules; else elseBlockSchedules">
                 <ng-container *ngFor="let schedule of record.schedules">
                   <p *ngIf="!!schedule.message">{{schedule.destination}}: {{schedule.message}}</p>
                 </ng-container>
               </ng-container>
-              <ng-template #elseBlock>
+              <ng-template #elseBlockSchedules>
                 <p>Loading schedules...</p>
               </ng-template>
             </ion-label>

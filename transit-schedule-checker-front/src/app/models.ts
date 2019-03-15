@@ -28,6 +28,7 @@ export class Record {
   destination: Destination;
   transilienDestination: Station;
   schedules: Schedule[];
+  traffic: Traffic;
 
   isValid(): boolean {
     if (!!this.type && !!this.line && !!this.station && (!!this.destination || !!this.transilienDestination)) {

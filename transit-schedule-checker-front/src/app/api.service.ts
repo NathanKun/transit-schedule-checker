@@ -129,6 +129,14 @@ export class ApiService {
               return [schedule];
             }
 
+            if (!!!result.passages.train) {
+              const schedule = new Schedule();
+              schedule.message = 'No schedule';
+              schedule.destination = 'error';
+
+              return [schedule];
+            }
+
             const trains: any[] = result.passages.train;
 
             for (const train of trains) {

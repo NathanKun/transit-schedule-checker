@@ -34,7 +34,7 @@
 
               <ng-container *ngIf="!!record.schedules; else elseBlockSchedules">
                 <ng-container *ngFor="let schedule of record.schedules">
-                  <p *ngIf="!!schedule.message">{{schedule.destination}}: {{schedule.message}}</p>
+                  <p text-wrap *ngIf="!!schedule.message">{{schedule.destination}}: {{schedule.message}}</p>
                 </ng-container>
               </ng-container>
               <ng-template #elseBlockSchedules>

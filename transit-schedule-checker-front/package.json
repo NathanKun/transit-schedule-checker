@@ -1,8 +1,8 @@
 {
-  "name": "transit-schedule-checker-front",
-  "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "name": "Transit Schedule Checker Front",
+  "version": "1.0.0",
+  "author": "NathanKun",
+  "homepage": "https://transit.catprogrammer.com/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -66,5 +66,5 @@
     "tslint": "~5.12.0",
     "typescript": "~3.1.6"
   },
-  "description": "An Ionic project"
+  "description": "Front project for Transit Schedule Checker"
 }

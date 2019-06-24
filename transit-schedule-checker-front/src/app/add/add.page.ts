@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { LoadingController, AlertController } from '@ionic/angular';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { LoadingController, AlertController, IonSelect, PopoverController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { zip } from 'rxjs';
 import { ApiService } from '../api.service';
@@ -11,6 +11,9 @@ import { Type, Station, Destination, Transport, Record, TransilienStations } fro
   styleUrls: ['add.page.scss']
 })
 export class AddPage {
+
+  @ViewChild('selectline') selectStation: IonSelect;
+
   constructor(public api: ApiService,
     public loadingController: LoadingController,
     public alertController: AlertController,
@@ -63,7 +66,6 @@ export class AddPage {
       this.typeIsTransilien = false;
       this.getTransportsByType(value);
     }
-
   }
 
   lineChanged(event) {

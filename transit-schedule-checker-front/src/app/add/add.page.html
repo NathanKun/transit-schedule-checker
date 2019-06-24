@@ -17,7 +17,7 @@
 
     <ion-item>
       <ion-label>Line</ion-label>
-      <ion-select #selectline [(ngModel)]="record.line" interface="action-sheet" placeholder="Select One Line" (ionChange)="lineChanged($event)" [disabled]="lines.length === 0">
+      <ion-select #lineSelect (click)="lineSelectClicked()" [(ngModel)]="record.line" interface="action-sheet" placeholder="Select One Line" (ionChange)="lineChanged($event)" [disabled]="lines.length === 0">
         <ion-select-option *ngFor="let line of lines" [value]="line">{{line.name + ' ' + line.directions}}</ion-select-option>
       </ion-select>
     </ion-item>

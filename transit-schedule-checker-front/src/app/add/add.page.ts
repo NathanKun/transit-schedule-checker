@@ -1,5 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { LoadingController, AlertController, IonSelect, PopoverController } from '@ionic/angular';
+import { Component } from '@angular/core';
+import { LoadingController, AlertController, ActionSheetController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { zip } from 'rxjs';
 import { ApiService } from '../api.service';
@@ -12,12 +12,11 @@ import { Type, Station, Destination, Transport, Record, TransilienStations } fro
 })
 export class AddPage {
 
-  @ViewChild('selectline') selectStation: IonSelect;
-
   constructor(public api: ApiService,
     public loadingController: LoadingController,
     public alertController: AlertController,
-    private localStorage: LocalStorage) {
+    private localStorage: LocalStorage,
+    public actionSheetController: ActionSheetController) {
 
   }
 
@@ -91,6 +90,24 @@ export class AddPage {
         }).then((a) => a.present());
       });
     });
+  }
+
+  async lineSelectClicked() {
+    if (this.lines.length > 100) {
+      const loading = await this.loadingController.create({
+        message: 'Loading...'
+      });
+      await loading.present();
+
+      const intervalId = setInterval(() => {
+        this.actionSheetController.getTop().then((ele) => {
+          if (ele) {
+            loading.dismiss();
+            clearInterval(intervalId);
+          }
+        });
+      }, 500);
+    }
   }
 
   async getTransportsByType(type: Type) {

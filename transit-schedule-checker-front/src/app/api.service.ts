@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClientModule, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { parseString } from 'xml2js';
@@ -17,7 +17,7 @@ export class ApiService {
   public transilienApi2StopAreas: Station[];
 
   constructor(
-    private http: HttpClientModule) {
+    private http: HttpClient) {
     this.initTransilienApi2StopAreas();
   }
 

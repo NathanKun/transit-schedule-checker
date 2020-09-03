@@ -273,9 +273,8 @@ export class ApiService {
               const message2 =
                 (data.canceled ? 'CANCELED ' : '') +
                 (data.delayed ? 'DELAYED ' : '') +
-                data.typeTrain + ' ' +
-                'Platforme ' + data.platform +
-                'to ' + data.destinationMission;
+                `Platforme ${data.platform} ` +
+                `to ${data.destinationMission}`;
 
               const message3 =
                 (data.hasTraficDisruption ? 'TRAFFIC DISRUPTION' : '') +
@@ -285,7 +284,7 @@ export class ApiService {
                 message: message,
                 message2: message2,
                 message3: message3,
-                destination: data.codeMission
+                destination: `${data.codeMission} ${data.typeTrain}`
               });
             }
 

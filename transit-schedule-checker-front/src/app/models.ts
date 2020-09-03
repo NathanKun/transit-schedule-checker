@@ -18,6 +18,8 @@ export class Station {
 
 export class Schedule {
   message: string;
+  message2?: string;
+  message3?: string;
   destination: string;
 }
 

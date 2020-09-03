@@ -1,8 +1,6 @@
 <?php
 
 include('credentials.inc.php');
-global $username;
-global $password;
 global $credential;
 
 if (!isset($_GET['credential'])) {

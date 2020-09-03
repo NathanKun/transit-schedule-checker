@@ -1,9 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
-import { AlertController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { Observable, forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { ApiService } from '../api.service';
-import { Schedule, Type, Record } from '../models';
+import { Record, Schedule, Type } from '../models';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: 'dashboard.page.html',
@@ -14,12 +14,9 @@ export class DashboardPage {
   @ViewChild('reorderGroup') reorderGroup: any;
 
   records: Record[] = [];
-  showDeleteButtons = false;
 
   constructor(public api: ApiService,
-    public alertController: AlertController,
-    private localStorage: LocalStorage) {
-
+              private localStorage: LocalStorage) {
   }
 
   ionViewWillEnter() {
@@ -82,7 +79,8 @@ export class DashboardPage {
     this.records.splice(index, 1);
 
     const records = Object.assign([], this.records);
-    this.localStorage.setItem('records', records).subscribe(() => { });
+    this.localStorage.setItem('records', records).subscribe(() => {
+    });
   }
 
   reorderButtonClicked() {
@@ -97,6 +95,7 @@ export class DashboardPage {
       rec.schedules = undefined;
     }
 
-    this.localStorage.setItem('records', records).subscribe(() => { });
+    this.localStorage.setItem('records', records).subscribe(() => {
+    });
   }
 }

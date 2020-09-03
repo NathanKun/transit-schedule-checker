@@ -17,7 +17,7 @@
   </ion-refresher>
 
   <ion-list>
-    <ion-reorder-group #reorderGroup (ionItemReorder)="reorderHandler($event)">
+    <ion-reorder-group (ionItemReorder)="reorderHandler($event)">
       <ion-item *ngFor="let record of records; let i = index">
         <ion-reorder *ngIf="!reorderGroup.disabled"></ion-reorder>
 
@@ -35,6 +35,8 @@
               <ng-container *ngIf="!!record.schedules; else elseBlockSchedules">
                 <ng-container *ngFor="let schedule of record.schedules">
                   <p text-wrap *ngIf="!!schedule.message">{{schedule.destination}}: {{schedule.message}}</p>
+                  <p text-wrap *ngIf="!!schedule.message2">{{schedule.message}}</p>
+                  <p text-wrap *ngIf="!!schedule.message3">{{schedule.message}}</p>
                 </ng-container>
               </ng-container>
               <ng-template #elseBlockSchedules>

@@ -1,19 +1,25 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClientModule, HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { parseString } from 'xml2js';
-import { Type, Station, Destination, Transport, Record, Schedule, Traffic } from './models';
+import { Destination, Record, Schedule, Station, Traffic, Transport, Type } from './models';
 import { Credentials } from './credentials';
 
 const ratpUrl = 'https://transitapi.catprogrammer.com/ratp';
 const transilienUrl = 'https://transitapi.catprogrammer.com/transilien.php';
+const transilienUrlApi2 = 'https://transitapi.catprogrammer.com/transilien2.php';
+const transilienUrlApi2StopAreas = 'https://transitapi.catprogrammer.com/transilien2-stopareas.php';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
 
+  public transilienApi2StopAreas: Station[];
+
   constructor(
-    private http: HttpClient) { }
+    private http: HttpClientModule) {
+    this.initTransilienApi2StopAreas();
+  }
 
   getTransportsByType(type: Type): Observable<Transport[]> {
     const url = `${ratpUrl}/lines/${type.name}`;
@@ -129,7 +135,7 @@ export class ApiService {
               return [schedule];
             }
 
-            if (!!!result.passages.train) {
+            if (!result.passages.train) {
               const schedule = new Schedule();
               schedule.message = 'No schedule';
               schedule.destination = 'error';
@@ -174,6 +180,99 @@ export class ApiService {
       catchError(this.handleError<Schedule[]>(
         `getTransilienSchedule`
       ))
+    );
+  }
+
+  private initTransilienApi2StopAreas() {
+    const url = `${transilienUrlApi2StopAreas}`;
+
+    this.http.get<any>(url).pipe(
+      map((res: any) => {
+        const stations: Station[] = [];
+        for (const p of res.places) {
+          stations.push({ name: p.label, slug: p.uic });
+        }
+        return stations;
+      }),
+      tap(_ => console.log(
+        `fetched transilien api2 stop areas url=${url}`
+      )),
+      catchError(this.handleError<Station[]>(`getTransilienApi2StopAreas`))
+    )
+      .subscribe(stations => this.transilienApi2StopAreas = stations);
+  }
+
+  private findApi2StationByName(name: String): Station {
+    let station: Station = this.transilienApi2StopAreas.find(s => s.name.toUpperCase() === name.toUpperCase());
+    if (!station) {
+      const res = this.transilienApi2StopAreas.filter(s => s.name.toUpperCase().indexOf(name.toUpperCase()) >= 0);
+      if (res.length) {
+        station = res[0];
+      }
+    }
+
+    return station;
+  }
+
+  getTransilienSchedulesApi2(fromname: string, toname: string): Observable<Schedule[]> {
+
+    const api2From = this.findApi2StationByName(fromname);
+    const api2To = this.findApi2StationByName(toname);
+
+    if (!api2From || !api2To) {
+      return Observable.create(null);
+    }
+
+    const url = `${transilienUrlApi2}?from=${api2From.slug}&fromname=${api2From.name}&to=${api2To.slug}` +
+      `&credential=${Credentials.TransilienCredential}`;
+
+    return this.http.get<any>(url).pipe(
+      map((res: any) => {
+        const schedules: Schedule[] = [];
+        for (const data of res.nextTrainsList) {
+          // calculate departure in x min
+          const departureTime = data.departureTime;
+          const departureTimeSplit = departureTime.split(':');
+          const hour = departureTimeSplit[0];
+          const minute = departureTimeSplit[1];
+          const departureTimeObj = new Date();
+          departureTimeObj.setHours(hour);
+          departureTimeObj.setMinutes(minute);
+          if (departureTimeObj.getTime() < Date.now()) {
+            departureTimeObj.setDate(departureTimeObj.getDate() + 1);
+            // setDate + 1 takes care of automatically incrementing the month if necessary
+          }
+          const diffMinutes = Math.floor((departureTimeObj.getTime() - Date.now()) / 1000 / 60);
+
+          // construct messages
+          const message =
+            'In ' + diffMinutes + ' min (' + departureTime + ') ' +
+            'Arrival at ' + data.arrivalTime;
+          const message2 =
+            (data.canceled ? 'CANCELED ' : '') +
+            (data.delayed ? 'DELAYED ' : '') +
+            data.codeMission + ' ' +
+            data.typeTrain + ' ' +
+            'Platforme ' + data.platform;
+          const message3 =
+            (data.hasTraficDisruption ? 'TRAFFIC DISRUPTION' : '') +
+            (data.hasTravauxDisruption ? 'TRAVAUX DISRUPTION' : '');
+          const destination = data.destinationMission;
+
+          schedules.push({
+            message: message,
+            message2: message2,
+            message3: message3,
+            destination: destination
+          });
+        }
+
+        return schedules;
+      }),
+      tap(_ => console.log(
+        `fetched transilien api2 stop areas url=${url}`
+      )),
+      catchError(this.handleError<Schedule[]>(`getTransilienSchedulesApi2`))
     );
   }
 

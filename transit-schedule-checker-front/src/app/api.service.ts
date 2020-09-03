@@ -168,7 +168,7 @@ export class ApiService {
             }
           });
 
-          return schedules;
+          return schedules.slice(0, 10);
 
         } else {
           const schedule = new Schedule();
@@ -213,10 +213,10 @@ export class ApiService {
   }
 
   private findApi2StationByName(name: string, stations: Station[]): Station {
-    let station: Station = this.transilienApi2StopAreas.find(
+    let station: Station = stations.find(
       s => ApiService.nomalizeStationString(s.name) === ApiService.nomalizeStationString(name));
     if (!station) {
-      const res = this.transilienApi2StopAreas.filter(
+      const res = stations.filter(
         s => ApiService.nomalizeStationString(s.name).indexOf(ApiService.nomalizeStationString(name)) >= 0);
       if (res.length) {
         station = res[0];

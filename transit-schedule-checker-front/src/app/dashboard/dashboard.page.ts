@@ -38,7 +38,7 @@ export class DashboardPage {
       }
     }
 
-    const observables = [];
+    const observables: Observable<Schedule[]>[] = [];
     for (const record of this.records) {
       // schedules
       let obs: Observable<Schedule[]>;
@@ -58,9 +58,18 @@ export class DashboardPage {
       }
     }
 
-    forkJoin(...observables).subscribe(results => {
+    forkJoin(...observables).subscribe((results: Schedule[][]) => {
       for (let i = 0; i < results.length; i++) {
         this.records[i].schedules = results[i];
+
+        // if transilien api1 returns error, use transilien api2
+        if (results[i].length === 0 || results[i][0].destination === 'error') {
+          this.api.getTransilienSchedulesApi2(this.records[i].station.name, this.records[i].transilienDestination.name)
+            .subscribe(
+              resApi2 => {
+                this.records[i].schedules = this.records[i].schedules.concat(resApi2.slice(0, 5));
+              });
+        }
       }
 
       if (onFinished instanceof Function) {

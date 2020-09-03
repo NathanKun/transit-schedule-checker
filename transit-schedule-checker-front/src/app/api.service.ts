@@ -14,11 +14,15 @@ const transilienUrlApi2StopAreas = 'https://transitapi.catprogrammer.com/transil
 @Injectable({ providedIn: 'root' })
 export class ApiService {
 
-  public transilienApi2StopAreas: Station[];
-
   constructor(
     private http: HttpClient) {
     this.initTransilienApi2StopAreas();
+  }
+
+  public transilienApi2StopAreas: Station[];
+
+  static nomalizeStationString(str: string): string {
+    return str.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
   getTransportsByType(type: Type): Observable<Transport[]> {
@@ -131,16 +135,16 @@ export class ApiService {
               const schedule = new Schedule();
               schedule.message = res.status + ' ' + res.statusText;
               schedule.destination = 'error';
-
-              return [schedule];
+              schedules.push(schedule);
+              return;
             }
 
             if (!result.passages.train) {
               const schedule = new Schedule();
-              schedule.message = 'No schedule';
+              schedule.message = 'Api1 returns No schedule';
               schedule.destination = 'error';
-
-              return [schedule];
+              schedules.push(schedule);
+              return;
             }
 
             const trains: any[] = result.passages.train;
@@ -184,12 +188,12 @@ export class ApiService {
   }
 
   private initTransilienApi2StopAreas() {
-    const url = `${transilienUrlApi2StopAreas}`;
+    const url = `${transilienUrlApi2StopAreas}?credential=${Credentials.TransilienCredential}`;
 
     this.http.get<any>(url).pipe(
       map((res: any) => {
         const stations: Station[] = [];
-        for (const p of res.places) {
+        for (const p of res.content) {
           stations.push({ name: p.label, slug: p.uic });
         }
         return stations;
@@ -202,10 +206,12 @@ export class ApiService {
       .subscribe(stations => this.transilienApi2StopAreas = stations);
   }
 
-  private findApi2StationByName(name: String): Station {
-    let station: Station = this.transilienApi2StopAreas.find(s => s.name.toUpperCase() === name.toUpperCase());
+  private findApi2StationByName(name: string): Station {
+    let station: Station = this.transilienApi2StopAreas.find(
+      s => ApiService.nomalizeStationString(s.name) === ApiService.nomalizeStationString(name));
     if (!station) {
-      const res = this.transilienApi2StopAreas.filter(s => s.name.toUpperCase().indexOf(name.toUpperCase()) >= 0);
+      const res = this.transilienApi2StopAreas.filter(
+        s => ApiService.nomalizeStationString(s.name).indexOf(ApiService.nomalizeStationString(name)) >= 0);
       if (res.length) {
         station = res[0];
       }
@@ -220,7 +226,10 @@ export class ApiService {
     const api2To = this.findApi2StationByName(toname);
 
     if (!api2From || !api2To) {
-      return Observable.create(null);
+      return of([{
+        destination: 'api2 station not found',
+        message: `api2From=${api2From ? api2From.name : 'undefined'} api2To=${api2To ? api2To.name : 'undefined'}`
+      }]);
     }
 
     const url = `${transilienUrlApi2}?from=${api2From.slug}&fromname=${api2From.name}&to=${api2To.slug}` +
@@ -245,25 +254,31 @@ export class ApiService {
           const diffMinutes = Math.floor((departureTimeObj.getTime() - Date.now()) / 1000 / 60);
 
           // construct messages
+          /*let destinationMission = data.destinationMission;
+          if (destinationMission.length > 20) {
+            destinationMission = destinationMission.substr(0, 20) + '...';
+          }*/
+
           const message =
             'In ' + diffMinutes + ' min (' + departureTime + ') ' +
             'Arrival at ' + data.arrivalTime;
+
           const message2 =
             (data.canceled ? 'CANCELED ' : '') +
             (data.delayed ? 'DELAYED ' : '') +
-            data.codeMission + ' ' +
             data.typeTrain + ' ' +
-            'Platforme ' + data.platform;
+            'Platforme ' + data.platform +
+            'to ' + data.destinationMission;
+
           const message3 =
             (data.hasTraficDisruption ? 'TRAFFIC DISRUPTION' : '') +
             (data.hasTravauxDisruption ? 'TRAVAUX DISRUPTION' : '');
-          const destination = data.destinationMission;
 
           schedules.push({
             message: message,
             message2: message2,
             message3: message3,
-            destination: destination
+            destination: data.codeMission
           });
         }
 

@@ -11,7 +11,7 @@ import { Record, Schedule, Type } from '../models';
 })
 export class DashboardPage {
 
-  @ViewChild('reorderGroup', { static: false }) reorderGroup: any;
+  @ViewChild('reorderGroup') reorderGroup: any;
 
   records: Record[] = [];
 

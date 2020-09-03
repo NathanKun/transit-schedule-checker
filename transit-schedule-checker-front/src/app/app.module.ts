@@ -23,6 +23,7 @@ import { CookieService } from 'ngx-cookie-service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { StorageModule } from '@ngx-pwa/local-storage';
 
 @NgModule({
   declarations: [AppComponent],
@@ -43,7 +44,8 @@ import { AppComponent } from './app.component';
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    StorageModule.forRoot({ IDBNoWrap: false })
   ],
   providers: [
     StatusBar,

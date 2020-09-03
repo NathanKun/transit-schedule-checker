@@ -51,9 +51,9 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "optimization": true,
+              "optimization": false,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": true,
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
@@ -79,7 +79,7 @@
                   "maximumWarning": "6kb"
                 }
               ],
-              "progress": false
+              "progress": true
             }
           }
         },

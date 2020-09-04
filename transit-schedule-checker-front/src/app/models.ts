@@ -33,11 +33,7 @@ export class Record {
   traffic: Traffic;
 
   isValid(): boolean {
-    if (!!this.type && !!this.line && !!this.station && (!!this.destination || !!this.transilienDestination)) {
-      return true;
-    }
-
-    return false;
+    return !!this.type && !!this.line && !!this.station && (!!this.destination || !!this.transilienDestination);
   }
 }
 

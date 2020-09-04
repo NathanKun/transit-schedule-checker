@@ -23,7 +23,7 @@
 
         <ion-item-sliding>
           <ion-item>
-            <ion-label>
+            <ion-label (click)="presentModal(record)">
               <div class="record-head">
                 <h2>{{record.line.name}}</h2>
                 <h3>From {{record.station.name}} to {{!!record.destination ? record.destination.name : record.transilienDestination.name}}</h3>
@@ -34,7 +34,7 @@
                 <ion-label color="danger">{{record.traffic.message}}</ion-label>
               </ng-container>
 
-              <div class="schedules-container" *ngIf="!!record.schedules; else elseBlockSchedules" (click)="presentModal(record)">
+              <div class="schedules-container" *ngIf="!!record.schedules; else elseBlockSchedules">
                 <div class="schedule" *ngFor="let schedule of record.schedules">
                   <ion-label *ngIf="!!schedule.message">{{schedule.destination}}: {{schedule.message}}</ion-label>
                   <ion-label *ngIf="!!schedule.message2" color="light">{{schedule.message2}}</ion-label>

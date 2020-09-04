@@ -34,13 +34,13 @@
                 <ion-label color="danger">{{record.traffic.message}}</ion-label>
               </ng-container>
 
-              <ng-container *ngIf="!!record.schedules; else elseBlockSchedules">
-                <div class="transilien-schedule" *ngFor="let schedule of record.schedules">
-                  <p *ngIf="!!schedule.message">{{schedule.destination}}: {{schedule.message}}</p>
-                  <p *ngIf="!!schedule.message2">{{schedule.message2}}</p>
-                  <p *ngIf="!!schedule.message3">{{schedule.message3}}</p>
+              <div class="schedules-container" *ngIf="!!record.schedules; else elseBlockSchedules" (click)="presentModal(record)">
+                <div class="schedule" *ngFor="let schedule of record.schedules">
+                  <ion-label *ngIf="!!schedule.message">{{schedule.destination}}: {{schedule.message}}</ion-label>
+                  <ion-label *ngIf="!!schedule.message2" color="light">{{schedule.message2}}</ion-label>
+                  <ion-label *ngIf="!!schedule.message3" color="warn">{{schedule.message3}}</ion-label>
                 </div>
-              </ng-container>
+              </div>
               <ng-template #elseBlockSchedules>
                 <p>Loading schedules...</p>
               </ng-template>

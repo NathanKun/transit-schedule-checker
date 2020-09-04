@@ -1,0 +1,41 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>{{record.line.name}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-list>
+    <ion-item>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-label>
+              <h2>From</h2>
+              <p>{{record.station.name}}</p>
+            </ion-label>
+          </ion-col>
+          <ion-col>
+            <ion-label>
+              <h2>To</h2>
+              <p>{{!!record.destination ? record.destination.name : record.transilienDestination.name}}</p>
+            </ion-label>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+    <ion-item *ngIf="!!record.traffic && record.traffic.slug !== 'normal'">
+      <ion-label color="danger">{{record.traffic.title}}</ion-label>
+      <ion-label color="danger">{{record.traffic.message}}</ion-label>
+    </ion-item>
+    <ion-item *ngFor="let schedule of record.schedules">
+      <ion-label>
+        <ion-label class="msg" *ngIf="!!schedule.message">{{schedule.destination}}: {{schedule.message}}</ion-label>
+        <ion-label class="msg" *ngIf="!!schedule.message2" color="light">{{schedule.message2}}</ion-label>
+        <ion-label class="msg" *ngIf="!!schedule.message3" color="warn">{{schedule.message3}}</ion-label>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

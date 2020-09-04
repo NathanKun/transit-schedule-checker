@@ -9,6 +9,11 @@
 @import '~@ionic/angular/css/text-transformation.css';
 @import '~@ionic/angular/css/flex-utils.css';
 
+:root {
+  --ion-color-light: #444444;
+  --ion-color-warn: #9b3333;
+}
+
 .text-wrap-popover .sc-ion-select-popover {
   white-space: pre-line;
 }

@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DashboardPage } from './dashboard.page';
+import { DashboardRecordModelComponent } from '../dashboard-record-model/dashboard-record-model.component';
 
 @NgModule({
   imports: [
@@ -12,6 +13,6 @@ import { DashboardPage } from './dashboard.page';
     FormsModule,
     RouterModule.forChild([{ path: '', component: DashboardPage }])
   ],
-  declarations: [DashboardPage]
+  declarations: [DashboardPage, DashboardRecordModelComponent]
 })
 export class DashboardPageModule {}

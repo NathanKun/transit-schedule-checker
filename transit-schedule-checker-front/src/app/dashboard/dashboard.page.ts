@@ -1,8 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { forkJoin, Observable } from 'rxjs';
 import { ApiService } from '../api.service';
 import { Record, Schedule, Type } from '../models';
+import { DashboardRecordModelComponent } from '../dashboard-record-model/dashboard-record-model.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,9 +18,11 @@ export class DashboardPage {
   records: Record[] = [];
 
   constructor(public api: ApiService,
-              private localStorage: LocalStorage) {
+              private localStorage: LocalStorage,
+              public modalController: ModalController) {
   }
 
+  // noinspection JSUnusedGlobalSymbols
   ionViewWillEnter() {
     this.localStorage.getItem('records').subscribe((data: Record[]) => {
       if (data === null) {
@@ -29,6 +33,17 @@ export class DashboardPage {
 
       this.loadSchedules(null);
     });
+  }
+
+  private currentModal = null;
+
+  async presentModal(record: Record) {
+    const modal = await this.modalController.create({
+      component: DashboardRecordModelComponent,
+      componentProps: { record: record }
+    });
+    this.currentModal = modal;
+    return await modal.present();
   }
 
   loadSchedules(onFinished: Function) {
@@ -67,7 +82,7 @@ export class DashboardPage {
           this.api.getTransilienSchedulesApi2(this.records[i].station.name, this.records[i].transilienDestination.name)
             .subscribe(
               resApi2 => {
-                this.records[i].schedules = this.records[i].schedules.concat(resApi2.slice(0, 5));
+                this.records[i].schedules = resApi2;
               });
         }
       }

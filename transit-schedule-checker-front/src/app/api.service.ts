@@ -168,7 +168,7 @@ export class ApiService {
             }
           });
 
-          return schedules.slice(0, 10);
+          return schedules;
 
         } else {
           const schedule = new Schedule();

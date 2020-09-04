@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$context = stream_context_create($opts);
 
 	// Open the file using the HTTP headers set above
-	$file = file_POST_contents($remote_url, false, $context);
+	$file = file_get_contents($remote_url, false, $context);
 
 	if(is_array($http_response_header)) {
 		$parts=explode(' ',$http_response_header[0]);

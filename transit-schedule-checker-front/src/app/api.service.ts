@@ -144,9 +144,13 @@ export class ApiService {
   }
 
   getTransilienSchedules(from: string, to: string): Observable<Schedule[]> {
+    const body = new FormData();
+    body.append('from', from);
+    body.append('to', from);
+    body.append('credential', Credentials.TransilienCredential);
     return this.http.post(
       transilienUrl,
-      { from: from, to: to, credential: Credentials.TransilienCredential },
+      body,
       { observe: 'response', responseType: 'text' }).pipe(
       map((res: HttpResponse<string>) => {
           if (res.status === 200) {
@@ -242,9 +246,14 @@ export class ApiService {
           }]);
         }
 
+        const body = new FormData();
+        body.append('from', api2From.slug);
+        body.append('fromname', api2From.name);
+        body.append('to', api2To.slug);
+        body.append('credential', Credentials.TransilienCredential);
         return this.http.post<any>(
           transilienUrlApi2,
-          { from: api2From.slug, fromname: api2From.name, to: api2To.slug, credential: Credentials.TransilienCredential }
+          body
         ).pipe(
           map(res => {
             const schedules: Schedule[] = [];
@@ -384,9 +393,11 @@ export class ApiService {
     if (this.transilienApi2StopAreas) {
       return of(this.transilienApi2StopAreas);
     } else {
+      const body = new FormData();
+      body.append('credential', Credentials.TransilienCredential);
       return this.http.post<any>(
         transilienUrlApi2StopAreas,
-        { credential: Credentials.TransilienCredential }
+        body
       ).pipe(
         map((res: any) => {
           const stations: Station[] = [];

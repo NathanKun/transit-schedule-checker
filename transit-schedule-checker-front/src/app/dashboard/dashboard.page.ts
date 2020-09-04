@@ -35,14 +35,11 @@ export class DashboardPage {
     });
   }
 
-  private currentModal = null;
-
   async presentModal(record: Record) {
     const modal = await this.modalController.create({
       component: DashboardRecordModelComponent,
       componentProps: { record: record }
     });
-    this.currentModal = modal;
     return await modal.present();
   }
 
@@ -58,7 +55,7 @@ export class DashboardPage {
       // schedules
       let obs: Observable<Schedule[]>;
       if (record.type.name === Type.TRANSILIEN.name) {
-        obs = this.api.getTransilienSchedules(record.station.slug, record.transilienDestination.slug);
+        obs = this.api.getTransilienSchedulesApi2(record.station.name, record.transilienDestination.name);
         observables.push(obs);
       } else {
         obs = this.api.getSchedulesByRecord(record);
@@ -77,12 +74,12 @@ export class DashboardPage {
       for (let i = 0; i < results.length; i++) {
         this.records[i].schedules = results[i];
 
-        // if transilien api1 returns error, use transilien api2
+        // if transilien api2 returns error, use transilien api1
         if (results[i].length === 0 || results[i][0].destination === 'error') {
-          this.api.getTransilienSchedulesApi2(this.records[i].station.name, this.records[i].transilienDestination.name)
+          this.api.getTransilienSchedules(this.records[i].station.slug, this.records[i].transilienDestination.slug)
             .subscribe(
-              resApi2 => {
-                this.records[i].schedules = resApi2;
+              resApi1 => {
+                this.records[i].schedules = resApi1;
               });
         }
       }

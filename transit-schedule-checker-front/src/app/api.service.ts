@@ -241,8 +241,8 @@ export class ApiService {
 
         if (!api2From || !api2To) {
           return of([{
-            destination: 'api2 station not found',
-            message: `api2From=${api2From ? api2From.name : 'undefined'} api2To=${api2To ? api2To.name : 'undefined'}`
+            destination: 'error',
+            message: `api2 station not found: api2From=${api2From ? api2From.name : 'undefined'} api2To=${api2To ? api2To.name : 'undefined'}`
           }]);
         }
 
@@ -395,6 +395,7 @@ export class ApiService {
     } else {
       const body = new FormData();
       body.append('credential', Credentials.TransilienCredential);
+
       return this.http.post<any>(
         transilienUrlApi2StopAreas,
         body

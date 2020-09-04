@@ -144,9 +144,10 @@ export class ApiService {
   }
 
   getTransilienSchedules(from: string, to: string): Observable<Schedule[]> {
-    const url = `${transilienUrl}?from=${from}&to=${to}&credential=${Credentials.TransilienCredential}`;
-
-    return this.http.get(url, { observe: 'response', responseType: 'text' }).pipe(
+    return this.http.post(
+      transilienUrl,
+      { from: from, to: to, credential: Credentials.TransilienCredential },
+      { observe: 'response', responseType: 'text' }).pipe(
       map((res: HttpResponse<string>) => {
           if (res.status === 200) {
             const schedules: Schedule[] = [];
@@ -216,7 +217,7 @@ export class ApiService {
         }
       ),
       tap(_ => console.log(
-        `fetched transilien schedules url=${url}`
+        `fetched transilien schedules url=${transilienUrl}`
       )),
       catchError(this.handleError<Schedule[]>(
         `getTransilienSchedule`,
@@ -241,10 +242,10 @@ export class ApiService {
           }]);
         }
 
-        const url = `${transilienUrlApi2}?from=${api2From.slug}&fromname=${api2From.name}&to=${api2To.slug}` +
-          `&credential=${Credentials.TransilienCredential}`;
-
-        return this.http.get<any>(url).pipe(
+        return this.http.post<any>(
+          transilienUrlApi2,
+          { from: api2From.slug, fromname: api2From.name, to: api2To.slug, credential: Credentials.TransilienCredential }
+        ).pipe(
           map(res => {
             const schedules: Schedule[] = [];
             for (const data of res.nextTrainsList) {
@@ -293,7 +294,7 @@ export class ApiService {
             return schedules;
           }),
           tap(_ => console.log(
-            `fetched transilien api2 schedules url=${url}`
+            `fetched transilien api2 schedules url=${transilienUrlApi2}`
           )),
           catchError(this.handleError<Schedule[]>(`getTransilienSchedulesApi2`, [{
             message: 'getTransilienSchedulesApi2 failed',
@@ -383,9 +384,10 @@ export class ApiService {
     if (this.transilienApi2StopAreas) {
       return of(this.transilienApi2StopAreas);
     } else {
-      const url = `${transilienUrlApi2StopAreas}?credential=${Credentials.TransilienCredential}`;
-
-      return this.http.get<any>(url).pipe(
+      return this.http.post<any>(
+        transilienUrlApi2StopAreas,
+        { credential: Credentials.TransilienCredential }
+      ).pipe(
         map((res: any) => {
           const stations: Station[] = [];
           for (const p of res.content) {
@@ -394,7 +396,7 @@ export class ApiService {
           return stations;
         }),
         tap(_ => console.log(
-          `fetched transilien api2 stop areas url=${url}`
+          `fetched transilien api2 stop areas url=${transilienUrlApi2StopAreas}`
         )),
         tap(stations =>
           this.transilienApi2StopAreas = stations

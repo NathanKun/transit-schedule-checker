@@ -435,7 +435,7 @@ export class ApiService {
                 s => s.keyword &&
                     s.keyword.length &&
                     s.keyword.find(
-                        k => k && k.length && (ApiService.normalizeStationString(k) === ApiService.normalizeStationString(s.name))
+                        k => k && k.length && (ApiService.normalizeStationString(k) === ApiService.normalizeStationString(name))
                     ) != null
             )
         }

@@ -2,3 +2,4 @@ back/credentials.inc.php
 transit-schedule-checker-front/src/app/credentials.ts
 transit-schedule-checker-front/dist/
 transit-schedule-checker-front/out-tsc/
+.idea/

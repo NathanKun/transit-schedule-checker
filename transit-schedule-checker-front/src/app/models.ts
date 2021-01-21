@@ -14,6 +14,7 @@ export class Destination {
 export class Station {
   slug: string;
   name: string;
+  keyword?: string[]
 }
 
 export class Schedule {

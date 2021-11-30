@@ -357,7 +357,7 @@ export class ApiService {
             )),
             catchError(this.handleError<Traffic[]>(`getRatpTraffic`, [{
                 line: '',
-                message: 'getRatpTrafficByRecord failed',
+                message: 'getRatpTraffic failed',
                 slug: '',
                 title: 'error',
                 type: null

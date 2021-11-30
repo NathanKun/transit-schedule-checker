@@ -41,7 +41,7 @@ export class Record {
 export class Type {
   static readonly RER = new Type('RERS', 'rers', true, 'RER');
   static readonly METRO = new Type('METRO', 'metros', true, 'Metro');
-  static readonly BUS = new Type('BUS', 'bus', false, 'Bus');
+  static readonly BUS = new Type('BUS', 'buses', false, 'Bus');
   static readonly TRAMWAY = new Type('TRAMWAY', 'tramways', true, 'Tramway');
   static readonly NOCTILIEN = new Type('NOCTILIEN', 'noctiliens', false, 'Noctilien');
   static readonly TRANSILIEN = new Type('TRANSILIEN', 'transilien', false, 'Transilien');
